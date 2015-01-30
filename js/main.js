@@ -1,5 +1,6 @@
 var app = {
 	counter:0,
+	currentQuestion:0,
 	currentAnswer: undefined,
 	correctAnswers:0,
 	questions:[["What is JavaScript?",["The dialect of Marcian language.","Some fancy word nerdy people tend to use every now and then.","Dynamic computer programming language.","Name of my neighbor's cat"],2],["Now get your brain in gear. Here comes real questions:<br><br>(function(){<br> &nbsp&nbsp&nbsp&nbsp return typeof arguments;<br>})();",["\"object\"","\"array\"","\"arguments\"","\"undefined\""],0],["  var f = function g(){ return 23; };<br>&nbsp&nbsp&nbsp&nbsptypeof g();",["\"number\"","\"undefined\"","\"function\"","Error"],3],["var y = 1, x = y = typeof x;<br>&nbsp&nbsp&nbsp&nbspx;",["1","\"number\"","undefined","\"undefined\""],3],["  (function f(f){<br>&nbsp&nbsp&nbsp&nbsp  return typeof f();<br>})(function(){ return 1; });",["\"number\"","undefined","\"function\"","Error"],0],["var f = (function f(){ return \"1\"; }, function g(){ return 2; })();<br>&nbsp&nbsp&nbsp&nbsp typeof f;",["\"string\"","number","\"function\"","undefined"],1],["var x = [typeof x, typeof y][1];<br>&nbsp&nbsp&nbsp&nbsp typeof typeof x;",["\"number\"","string","\"undefined\"","\"object\""],1],["(function f(){<br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp function f(){ return 1; }<br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp return f();<br>&nbsp&nbsp&nbsp&nbsp function f(){ return 2; }<br>})();",["1","2","Error","undefined"],1]],
@@ -8,6 +9,19 @@ var app = {
 	},
 
 	bindEvents: function(){
+		var control = document.querySelector(".controls");
+		control.addEventListener("click", function(){
+			var audio = document.querySelector("audio");
+			if(!audio.paused)
+			{
+				audio.pause();
+				control.style.backgroundPosition = "-3px -30px";
+			}
+			else {
+				audio.play();
+				control.style.backgroundPosition = "-3px 0px";
+			}
+		});
 		var userSubmit = document.querySelector(".submit");
 		userSubmit.addEventListener("click", this.switchScreen);
 	},
@@ -16,7 +30,7 @@ var app = {
 		// first we have to make a small check on user inputs
 		var inputList = document.querySelectorAll(".login input");
 		var container =  document.querySelector(".visible");
-		if(inputList[0].value=="" || inputList[1].value==""){
+		if(inputList[0].value==""){
 			swal("Come on dude, fill the form and get your hands dirty with the test!");
 		}
 		else{
@@ -41,13 +55,18 @@ var app = {
 		var t =document.createTextNode("check")
 		check.appendChild(t);
 		document.body.appendChild(check);
+		var counter = document.createElement("div");
+		counter.classList.add("counter");
+		counter.innerHTML = "<span class='current'></span>/<span class='all'>"+this.questions.length+"</span>";
+		document.body.appendChild(counter);
+
 		//Next module
 		this.startTest();
 	},
 	createQuestion:function(){
 		var testContainer =this.getTestContainer();
 		var question = document.createElement("p");
-		question.setAttribute("class","question animated fadeInDown");
+		question.setAttribute("class","question");
 		testContainer.insertBefore(question, testContainer.firstChild);	
 		return document.querySelector(".question");
 	},
@@ -64,11 +83,25 @@ var app = {
 	},
 
 	fillHTML:function() {
+		this.currentQuestion++;
+		document.querySelector(".current").innerHTML=this.currentQuestion;
 		var question = this.createQuestion();
 		var testContainer = this.getTestContainer();
 		var form = document.getElementById("test-form");
 		// Updating a QUESTION
-		question.innerHTML = this.questions[this.counter][0];
+
+		// Making typing effect for question!!!
+		var questionText = this.questions[this.counter][0];
+		var currentChar = 1;
+		function type() {
+			question.innerHTML = questionText.substr(0,currentChar);
+			currentChar++;
+			if (currentChar<=questionText.length) {
+				setTimeout(type, 40);
+			}	
+		}
+		type();
+
 		// Updating ANSWERS
 		for (var answer in this.questions[this.counter][1])
 		{

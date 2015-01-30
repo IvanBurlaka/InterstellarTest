@@ -304,3 +304,18 @@ padding-left: 25%;
 	height: 361px !important;
 	background-image: url(../img/false.jpg);
 }
+.controls {
+height: 30px;
+width: 24px;
+padding: 1px;
+background: transparent url(../img/stop.png) -3px 0px no-repeat;
+display: block;
+margin: 20px 0 0 20px;
+}
+.counter {
+	position: absolute;
+	left: 90%;
+	top: 5%;
+	color: white;
+	font-size: 40px;
+}
